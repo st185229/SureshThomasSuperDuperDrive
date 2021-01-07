@@ -1,6 +1,5 @@
 package com.udacity.jwdnd.course1.cloudstorage.controller;
 
-import com.udacity.jwdnd.course1.cloudstorage.exception.StorageException;
 import com.udacity.jwdnd.course1.cloudstorage.exception.StorageFileNotFoundException;
 import com.udacity.jwdnd.course1.cloudstorage.model.UserFile;
 import com.udacity.jwdnd.course1.cloudstorage.services.StorageService;
@@ -16,9 +15,8 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Controller
@@ -42,6 +40,16 @@ public class UserFileController {
                         "serveFile", path.getFileName().toString()).build().toUri().toString())
                 .collect(Collectors.toList()));
 
+        List<UserFile> list = userFileService.getCurrentUserFiles();
+
+        for(UserFile uf : list){
+            System.out.println(uf.getFilename()+uf.getContenttype()+uf.getUserid());
+        }
+
+
+        model.addAttribute("files-from-db",userFileService.getCurrentUserFiles());
+
+
 
         return "home";
     }
@@ -57,24 +65,24 @@ public class UserFileController {
 
     @PostMapping("/")
     public String handleFileUpload(@RequestParam("file") MultipartFile file,
-                                   RedirectAttributes redirectAttributes) {
+                                   RedirectAttributes redirectAttributes) throws IOException {
 
 
-        System.out.println("File getting " + file.getName());
+
         storageService.store(file);
         redirectAttributes.addFlashAttribute("message",
                 "You successfully uploaded " + file.getOriginalFilename() + "!");
 
-        // Also add into database
+        byte[] fileContent = file.getBytes();
 
-        try (InputStream inputStream = file.getInputStream()) {
-
-            UserFile userFile = new UserFile(null, file.getName(),null, Long.toString(file.getSize()), userFileService.getFileOwnerUserId(), (FileInputStream) inputStream);
-            userFileService.addUserFile(userFile);
-        } catch (IOException e) {
-            System.out.println(e);
-            throw new StorageException("Failed to store file.", e);
-        }
+        UserFile userFile = new UserFile
+                (null,
+                        file.getOriginalFilename(),
+                        file.getContentType(),
+                        Long.toString(file.getSize()),
+                        userFileService.getFileOwnerUserId(),
+                        fileContent);
+        userFileService.addUserFile(userFile);
         return "redirect:/";
     }
 
