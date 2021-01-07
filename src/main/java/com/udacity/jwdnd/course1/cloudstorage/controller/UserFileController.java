@@ -2,11 +2,14 @@ package com.udacity.jwdnd.course1.cloudstorage.controller;
 
 import com.udacity.jwdnd.course1.cloudstorage.exception.StorageFileNotFoundException;
 import com.udacity.jwdnd.course1.cloudstorage.model.UserFile;
+import com.udacity.jwdnd.course1.cloudstorage.model.UserFileMetadata;
 import com.udacity.jwdnd.course1.cloudstorage.services.StorageService;
 import com.udacity.jwdnd.course1.cloudstorage.services.UserFileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
+import org.springframework.http.CacheControl;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,6 +19,7 @@ import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBui
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,32 +39,35 @@ public class UserFileController {
     @GetMapping("/")
     public String listUploadedFiles(Model model) throws IOException {
 
-        model.addAttribute("files", storageService.loadAll().map(
-                path -> MvcUriComponentsBuilder.fromMethodName(UserFileController.class,
-                        "serveFile", path.getFileName().toString()).build().toUri().toString())
-                .collect(Collectors.toList()));
-
-        List<UserFile> list = userFileService.getCurrentUserFiles();
-
-        for(UserFile uf : list){
-            System.out.println(uf.getFilename()+uf.getContenttype()+uf.getUserid());
-        }
-
-
-        model.addAttribute("files-from-db",userFileService.getCurrentUserFiles());
-
-
-
+        List<UserFileMetadata> list = userFileService.getCurrentUserFilesMetaData();
+        model.addAttribute("files",list);
         return "home";
     }
 
-    @GetMapping("/files/{filename:.+}")
+    @GetMapping("/files/view/{id}")
     @ResponseBody
-    public ResponseEntity<Resource> serveFile(@PathVariable String filename) {
+    public ResponseEntity<byte[]> serveFile(@PathVariable Integer id) {
 
+        HttpHeaders headers = new HttpHeaders();
+        byte[] media = userFileService.getUserFileId(id);
+        headers.setCacheControl(CacheControl.noCache().getHeaderValue());
+
+        ResponseEntity<byte[]> responseEntity = new ResponseEntity<>(media, headers, HttpStatus.OK);
+        return responseEntity;
+
+        /*
         Resource file = storageService.loadAsResource(filename);
         return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION,
                 "attachment; filename=\"" + file.getFilename() + "\"").body(file);
+
+         */
+    }
+
+    @GetMapping("/files/delete/{id}")
+    public String deleteFile(@PathVariable Integer id) {
+        boolean deleted = userFileService.deleteFileByFileIdAndUserId(id);
+
+        return "redirect:/";
     }
 
     @PostMapping("/")

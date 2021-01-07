@@ -6,6 +6,8 @@ import com.udacity.jwdnd.course1.cloudstorage.mapper.UserFilesMapper;
 
 import com.udacity.jwdnd.course1.cloudstorage.mapper.UserMapper;
 import com.udacity.jwdnd.course1.cloudstorage.model.UserFile;
+import com.udacity.jwdnd.course1.cloudstorage.model.UserFileMetadata;
+import org.apache.ibatis.annotations.Delete;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -56,6 +58,19 @@ public class UserFileService {
         throw new UserNotLoggedInException("User not logged-in");
     }
 
+    public List<UserFileMetadata> getCurrentUserFilesMetaData(){
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (!(authentication instanceof AnonymousAuthenticationToken)) {
+            String currentUserName = authentication.getName();
+
+            Integer userid = userMapper.getUserID(currentUserName);
+
+            return userFilesMapper.getFilesMetadata(userid);
+        }
+        throw new UserNotLoggedInException("User not logged-in");
+    }
+
     public Integer getFileOwnerUserId() {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -67,4 +82,16 @@ public class UserFileService {
 
     }
 
+  //  @Delete("DELETE from FILES WHERE userid = #{userid} AND fileId = #{fileId}")
+ //   byte[] deleteFileByFileIdAndUserId(Integer userid, Integer fileId );
+
+    public boolean deleteFileByFileIdAndUserId( Integer fileId ){
+       return  userFilesMapper.deleteFileByFileIdAndUserId(getFileOwnerUserId(),fileId);
+    }
+
+    //Make sure that the user is not requesting for other users
+    public byte[] getUserFileId(Integer fileId){
+        return userFilesMapper.getFileByFileIdAndUserId(getFileOwnerUserId(),fileId);
+
+    }
 }

@@ -53,26 +53,22 @@
                         <thead>
                         <tr>
                             <th scope="col" style="width: 20%"></th>
-                            <th scope="col" style="width: 80%">File Name</th>
+                            <th scope="col" style="width: 30%">File Name</th>
+                            <th scope="col" style="width: 20%">File Size (Bytes)</th>
+                            <th scope="col" style="width: 30%">File Type</th>
                         </tr>
                         </thead>
                         <tbody>
 
                         <tr th:each="file : ${files}">
                             <td>
-                                <a class="btn btn-success" target="_blank" th:href="${file}">View</a>
-                                <a class="btn btn-danger">Delete</a>
+                                <a class="btn btn-success" target="_blank" th:href="@{/files/view/__${file.fileId}__}">View</a>
+                                <a class="btn btn-danger" target="_blank" th:href="@{/files/delete/__${file.fileId}__}">Delete</a>
                             </td>
-                            <th scope="row"><p class="card-text" th:text="${file}" /></th>
+                            <th scope="row"><p class="card-text" th:text="${file.filename}" /></th>
+                            <th scope="row"><p class="card-text" th:text="${file.filesize}" /></th>
+                            <th scope="row"><p class="card-text" th:text="${file.contenttype}" /></th>
                         </tr>
-
-                      <!--  <tr th:each="file : ${files-from-db}">
-                            <td>
-                                <a class="btn btn-success" target="_blank" th:href="${file}">View</a>
-                                <a class="btn btn-danger">Delete</a>
-                            </td>
-                            <th scope="row"><p class="card-text" th:text="${file}" /></th>
-                        </tr>-->
 
                         </tbody>
                     </table>

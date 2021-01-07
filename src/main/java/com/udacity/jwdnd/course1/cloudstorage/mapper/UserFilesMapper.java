@@ -1,10 +1,8 @@
 package com.udacity.jwdnd.course1.cloudstorage.mapper;
 
 import com.udacity.jwdnd.course1.cloudstorage.model.UserFile;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Options;
-import org.apache.ibatis.annotations.Select;
+import com.udacity.jwdnd.course1.cloudstorage.model.UserFileMetadata;
+import org.apache.ibatis.annotations.*;
 
 import java.util.List;
 
@@ -15,10 +13,21 @@ public interface UserFilesMapper {
     UserFile getFile(Integer fileId);
 
    @Select("SELECT * from FILES WHERE userid = #{userid}")
-   //@Select("SELECT * from FILES")
     List<UserFile> getFiles(Integer userId);
+
+    @Select("SELECT fileId,filename,contenttype,filesize,userid from FILES WHERE userid = #{userid}")
+    List<UserFileMetadata> getFilesMetadata(Integer userId);
+
 
     @Insert("INSERT INTO FILES (filename, contenttype, filesize, userid, filedata) VALUES(#{filename}, #{contenttype}, #{filesize},#{userid}, #{filedata})")
     @Options(useGeneratedKeys = true, keyProperty = "fileId")
     int insert(UserFile file);
+
+    @Select("SELECT filedata  from FILES WHERE userid = #{userid} AND fileId = #{fileId}")
+    byte[] getFileByFileIdAndUserId(Integer userid, Integer fileId );
+
+    @Delete("DELETE from FILES WHERE userid = #{userid} AND fileId = #{fileId}")
+    boolean deleteFileByFileIdAndUserId(Integer userid, Integer fileId );
+
+
 }
