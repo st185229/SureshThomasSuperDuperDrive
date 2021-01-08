@@ -18,10 +18,10 @@ public class LoginControllerMockMvcTest {
 
     @Test
     public void testLoginWithoutName() throws Exception {
-        mvc.perform(get("/login").accept(org.springframework.http.MediaType.TEXT_HTML))
+        mvc.perform(get("/").accept(org.springframework.http.MediaType.TEXT_HTML))
                 .andExpect(status().isOk())
-                .andExpect(view().name("hello"))
-                .andExpect(model().attribute("user", "World"));
+                .andExpect(view().name("login"));
+
     }
 
     @Test

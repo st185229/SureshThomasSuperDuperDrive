@@ -47,9 +47,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .logoutSuccessUrl("/")
                 .invalidateHttpSession(true)
                 .deleteCookies("JSESSIONID");
-     /*   http
+        http
                 .exceptionHandling()
-                    .accessDeniedPage("/403");*/
+                    .accessDeniedPage("/403");
 
 
     }

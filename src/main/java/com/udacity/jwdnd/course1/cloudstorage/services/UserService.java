@@ -43,6 +43,10 @@ public class UserService {
         return userMapper.getUserID(username);
     }
 
+    public Integer getLoggedInUserId(){
+        return getLoggedInUser().getUserId();
+    }
+
     public User getLoggedInUser(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (!(authentication instanceof AnonymousAuthenticationToken)) {

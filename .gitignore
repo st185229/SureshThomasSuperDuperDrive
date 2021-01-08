@@ -56,3 +56,4 @@ target/
 hs_err_pid*
 /upload-dir/
 /data/
+/udacity.log.2021-01-07.0.gz

@@ -27,13 +27,13 @@
             </div>
         </nav>
 
-        <div th:if="${message}">
+        <div class="alert alert-info" role="alert" th:if="${message}">
            <strong th:text="${message}"/>
         </div>
 
         <div class="tab-content" id="nav-tabContent">
             <div aria-labelledby="nav-files-tab" class="tab-pane fade show active" id="nav-files" role="tabpanel">
-                <form  enctype="multipart/form-data" method="POST" th:action="@{/}">
+                <form  enctype="multipart/form-data" method="POST" th:action="@{/files}">
                     <div class="container">
                         <div class="row" style="margin: 1em;">
                             <div class="col-sm-2">
@@ -63,7 +63,7 @@
                         <tr th:each="file : ${files}">
                             <td>
                                 <a class="btn btn-success" target="_blank" th:href="@{/files/view/__${file.fileId}__}">View</a>
-                                <a class="btn btn-danger" target="_blank" th:href="@{/files/delete/__${file.fileId}__}">Delete</a>
+                                <a class="btn btn-danger" th:href="@{/files/delete/__${file.fileId}__}">Delete</a>
                             </td>
                             <th scope="row"><p class="card-text" th:text="${file.filename}" /></th>
                             <th scope="row"><p class="card-text" th:text="${file.filesize}" /></th>
@@ -90,14 +90,29 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <tr>
+
+
+                        <tr th:each="note : ${notes}">
                             <td>
-                                <button class="btn btn-success" type="button">Edit</button>
-                                <a class="btn btn-danger">Delete</a>
+                                <button class="btn btn-success" onclick="showNoteModal(this.getAttribute('data-noteId'), this.getAttribute('data-noteTitle'), this.getAttribute('data-noteDesc'))"
+                                        th:data-noteId="*{note.noteId}"
+                                        th:data-noteTitle="*{note.noteTitle}"
+                                        th:data-noteDesc="*{note.noteDescription}"
+                                        type="button">Edit
+
+                                </button>
+
+
+                                <a th:href="@{/note/delete/{noteId}(noteId=*{note.noteId})}" class="btn btn-danger">Delete</a>
                             </td>
-                            <th scope="row">Example Note Title</th>
-                            <td>Example Note Description</td>
+
+                            <th scope="row"><p class="card-text" th:text="${note.noteTitle}"/></th>
+                            <td><p class="card-text" th:text="${note.noteDescription}" /></td>
+
                         </tr>
+
+
+
                         </tbody>
                     </table>
                 </div>
@@ -113,7 +128,7 @@
                                 </button>
                             </div>
                             <div class="modal-body">
-                                <form action="#" method="POST">
+                                <form action="#" method="POST" th:action="@{/notes}">
                                     <input id="note-id" name="noteId" type="hidden">
                                     <div class="form-group">
                                         <label class="col-form-label" for="note-title">Title</label>
