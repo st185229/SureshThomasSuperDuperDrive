@@ -1,52 +1,55 @@
 package com.udacity.jwdnd.course1.cloudstorage.model;
 
-
-
 public class Notes {
-    private Integer noteId;
-    private String noteTitle;
-    private String noteDescription;
-    private Integer userId;
+    private Integer noteid;
+    private String notetitle;
+    private String notedescription;
+    private Integer userid;
 
-    public Notes(Integer noteId, String noteTitle, String noteDescription, Integer userid) {
-        this.noteId = noteId;
-        this.noteTitle = noteTitle;
-        this.noteDescription = noteDescription;
-        this.userId = userid;
+    public Notes(Integer noteid, String notetitle, String notedescription, Integer userid) {
+        this.noteid = noteid;
+        this.notetitle = notetitle;
+        this.notedescription = notedescription;
+        this.userid = userid;
     }
 
-    public Integer getNoteId() {
-        return noteId;
+    @Override
+    public String toString() {
+        return "Notes{" +
+                "noteid=" + noteid +
+                ", notetitle='" + notetitle + '\'' +
+                '}';
     }
 
-    public void setNoteId(Integer noteId) {
-        this.noteId = noteId;
-    }
-    public void setnoteid(Integer noteId) {
-        this.noteId = noteId;
+    public Integer getNoteid() {
+        return noteid;
     }
 
-    public String getNoteTitle() {
-        return noteTitle;
+    public void setNoteid(Integer noteid) {
+        this.noteid = noteid;
     }
 
-    public void setNoteTitle(String noteTitle) {
-        this.noteTitle = noteTitle;
+    public String getNotetitle() {
+        return notetitle;
     }
 
-    public String getNoteDescription() {
-        return noteDescription;
+    public void setNotetitle(String notetitle) {
+        this.notetitle = notetitle;
     }
 
-    public void setNoteDescription(String noteDescription) {
-        this.noteDescription = noteDescription;
+    public String getNotedescription() {
+        return notedescription;
     }
 
-    public Integer getUserId() {
-        return userId;
+    public void setNotedescription(String notedescription) {
+        this.notedescription = notedescription;
     }
 
-    public void setUserId(Integer userId) {
-        this.userId = userId;
+    public Integer getUserid() {
+        return userid;
+    }
+
+    public void setUserid(Integer userid) {
+        this.userid = userid;
     }
 }

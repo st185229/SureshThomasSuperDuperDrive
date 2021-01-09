@@ -9,33 +9,36 @@ import java.util.List;
 @Service
 public class NotesService {
 
-    private  final NotesMapper notesMapper;
-    private  final UserService userService;
+    private final NotesMapper notesMapper;
+    private final UserService userService;
 
     public NotesService(NotesMapper notesMapper, UserService userService) {
         this.notesMapper = notesMapper;
         this.userService = userService;
     }
 
-    public List<Notes> getNotes(){
+    public List<Notes> getNotes() {
 
         return notesMapper.get(userService.getLoggedInUserId());
 
     }
-    public Integer addNotes(Notes note){
-        note.setUserId(userService.getLoggedInUserId());
+
+    public Integer addNotes(Notes note) {
+        note.setUserid(userService.getLoggedInUserId());
         return notesMapper.create(note);
     }
 
-    public Integer deleteNotes(Integer noteid){
-        return notesMapper.delete(userService.getLoggedInUserId(),noteid);
+    public boolean deleteNotes(Integer noteid) {
+        int result = notesMapper.delete(userService.getLoggedInUserId(), noteid);
+        return result > 0;
     }
 
-    public boolean saveEditedNote(Notes note) {
-        int result = notesMapper.update(note.getNoteTitle(), note.getNoteDescription(), note.getNoteId());
-        if (result > 0) {
-            return true;
-        }
-        return false;
+    public boolean updateNotes(Notes note) {
+
+        note.setUserid(userService.getLoggedInUserId());
+        if (note.getNoteid() > 0) {
+            int result = notesMapper.update(note);
+            return result > 0;
+        } else return false;
     }
 }

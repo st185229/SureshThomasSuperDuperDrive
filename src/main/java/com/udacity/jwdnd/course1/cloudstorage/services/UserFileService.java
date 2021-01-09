@@ -2,19 +2,14 @@ package com.udacity.jwdnd.course1.cloudstorage.services;
 
 import com.udacity.jwdnd.course1.cloudstorage.exception.UserNotLoggedInException;
 import com.udacity.jwdnd.course1.cloudstorage.mapper.UserFilesMapper;
-
-
 import com.udacity.jwdnd.course1.cloudstorage.mapper.UserMapper;
 import com.udacity.jwdnd.course1.cloudstorage.model.UserFile;
 import com.udacity.jwdnd.course1.cloudstorage.model.UserFileMetadata;
-import org.apache.ibatis.annotations.Delete;
-import org.apache.ibatis.annotations.Select;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.sql.Blob;
 import java.util.List;
 
 
@@ -31,36 +26,17 @@ public class UserFileService {
 
     public int addUserFile(UserFile userFile) {
 
-      return userFilesMapper.insert
-              (new UserFile
-                      (null,
-                              userFile.getFilename(),
-                              userFile.getContenttype(),
-                              userFile.getFilesize(),
-                              userFile.getUserid(),
-                              userFile.getFiledata()));
-
-
+        return userFilesMapper.insert
+                (new UserFile
+                        (null,
+                                userFile.getFilename(),
+                                userFile.getContenttype(),
+                                userFile.getFilesize(),
+                                userFile.getUserid(),
+                                userFile.getFiledata()));
     }
 
-
-    public List<UserFile> getUserFiles(Integer userId) {
-
-        return userFilesMapper.getFiles(userId);
-
-    }
-
-    public List<UserFile> getCurrentUserFiles(){
-
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (!(authentication instanceof AnonymousAuthenticationToken)) {
-            String currentUserName = authentication.getName();
-            return getUserFiles(userMapper.getUserID(currentUserName));
-        }
-        throw new UserNotLoggedInException("User not logged-in");
-    }
-
-    public List<UserFileMetadata> getCurrentUserFilesMetaData(){
+    public List<UserFileMetadata> getCurrentUserFilesMetaData() {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (!(authentication instanceof AnonymousAuthenticationToken)) {
@@ -84,21 +60,18 @@ public class UserFileService {
 
     }
 
-  //  @Delete("DELETE from FILES WHERE userid = #{userid} AND fileId = #{fileId}")
- //   byte[] deleteFileByFileIdAndUserId(Integer userid, Integer fileId );
-
-    public boolean deleteFileByFileIdAndUserId( Integer fileId ){
-       return  userFilesMapper.deleteFileByFileIdAndUserId(getFileOwnerUserId(),fileId);
+    public boolean deleteFileByFileIdAndUserId(Integer fileId) {
+        return userFilesMapper.deleteFileByFileIdAndUserId(getFileOwnerUserId(), fileId);
     }
 
     //Make sure that the user is not requesting for other users
-    public UserFile getUserFileById(Integer fileId){
-        return userFilesMapper.getFileByFileIdAndUserId(getFileOwnerUserId(),fileId);
+    public UserFile getUserFileById(Integer fileId) {
+        return userFilesMapper.getFileByFileIdAndUserId(getFileOwnerUserId(), fileId);
 
     }
 
-   // Check any file exists with same name
-    public int doSameFileNameExists(String fileName){
-        return userFilesMapper.doSameFileNameExists(fileName,getFileOwnerUserId());
+    // Check any file exists with same name
+    public int doSameFileNameExists(String fileName) {
+        return userFilesMapper.doSameFileNameExists(fileName, getFileOwnerUserId());
     }
 }

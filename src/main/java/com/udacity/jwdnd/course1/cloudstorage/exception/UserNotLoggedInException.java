@@ -1,7 +1,6 @@
 package com.udacity.jwdnd.course1.cloudstorage.exception;
 
-public class UserNotLoggedInException extends RuntimeException{
-
+public class UserNotLoggedInException extends RuntimeException {
     public UserNotLoggedInException(String message) {
         super(message);
     }

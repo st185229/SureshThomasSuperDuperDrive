@@ -13,7 +13,6 @@ import java.util.Base64;
 
 @Service
 public class UserService {
-
     private final UserMapper userMapper;
     private final HashService hashService;
 
@@ -39,15 +38,11 @@ public class UserService {
         return userMapper.getUser(username);
     }
 
-    public Integer getUserID(String username) {
-        return userMapper.getUserID(username);
-    }
-
-    public Integer getLoggedInUserId(){
+    public Integer getLoggedInUserId() {
         return getLoggedInUser().getUserId();
     }
 
-    public User getLoggedInUser(){
+    public User getLoggedInUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (!(authentication instanceof AnonymousAuthenticationToken)) {
             String currentUserName = authentication.getName();

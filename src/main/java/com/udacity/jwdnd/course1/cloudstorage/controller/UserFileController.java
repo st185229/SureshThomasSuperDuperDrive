@@ -5,6 +5,7 @@ import com.udacity.jwdnd.course1.cloudstorage.model.UserFile;
 import com.udacity.jwdnd.course1.cloudstorage.services.UserFileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -26,11 +27,19 @@ public class UserFileController {
 
     @GetMapping("/files/view/{id}")
     @ResponseBody
-    public ResponseEntity serveFile(@PathVariable Integer id) throws SQLException {
+    public ResponseEntity serveFile(@PathVariable Integer id, RedirectAttributes redirectAttributes) throws SQLException {
+
         UserFile file = userFileService.getUserFileById(id);
+        if (file == null) {
+
+            redirectAttributes.addFlashAttribute("message",
+                    "The file id " + id + " either does not exits or you dont have access!");
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("Location", "redirect:/");
+            return new ResponseEntity<String>(headers, HttpStatus.FOUND);
+        }
         String contentType = file.getContenttype();
         String fileName = file.getFilename();
-
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(contentType))
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"")
@@ -78,9 +87,9 @@ public class UserFileController {
                         Long.toString(file.getSize()),
                         userFileService.getFileOwnerUserId(),
                         fileContent);
-        userFileService.addUserFile(userFile);
-        redirectAttributes.addFlashAttribute("message",
-                "You successfully uploaded " + file.getOriginalFilename() + "!");
+        if (userFileService.addUserFile(userFile) > 0)
+            redirectAttributes.addFlashAttribute("message",
+                    "You successfully uploaded " + file.getOriginalFilename() + "!");
         return "redirect:/";
     }
 
