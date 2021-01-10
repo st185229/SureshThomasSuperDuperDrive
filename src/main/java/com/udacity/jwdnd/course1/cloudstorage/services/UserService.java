@@ -13,7 +13,7 @@ import java.util.Base64;
 
 @Service
 public class UserService {
-    private final UserMapper userMapper;
+    private final UserMapper userMapper ;
     private final HashService hashService;
 
     public UserService(UserMapper userMapper, HashService hashService) {
@@ -33,13 +33,19 @@ public class UserService {
         String hashedPassword = hashService.getHashedValue(user.getPassword(), encodedSalt);
         return userMapper.insert(new User(null, user.getUsername(), encodedSalt, hashedPassword, user.getFirstName(), user.getLastName()));
     }
+    public int deleteTestUsers(){
+        return userMapper.deleteTestUsers();
+    }
 
     public User getUser(String username) {
         return userMapper.getUser(username);
     }
 
     public Integer getLoggedInUserId() {
-        return getLoggedInUser().getUserId();
+        var userid = getLoggedInUser().getUserId();
+        if( userid == null )return 0;
+        return userid;
+
     }
 
     public User getLoggedInUser() {
@@ -50,4 +56,7 @@ public class UserService {
         }
         throw new UserNotLoggedInException("User not logged-in");
     }
+
+
+
 }

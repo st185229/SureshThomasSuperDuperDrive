@@ -12,7 +12,7 @@
 <div class="container">
     <div id="logoutDiv">
         <form action="#" method="POST" th:action="@{/logout}">
-            <button class="btn btn-secondary float-right" type="submit">Logout</button>
+            <button id="logout" class="btn btn-secondary float-right" type="submit">Logout</button>
         </form>
     </div>
     <div id="contentDiv" style="clear: right;">
@@ -29,8 +29,8 @@
             </div>
         </nav>
 
-        <div class="alert alert-info" role="alert" th:if="${message}">
-            <strong th:text="${message}"/>
+        <div  class="alert alert-info" role="alert" th:if="${message}">
+            <strong id="alert-message" th:text="${message}"/>
         </div>
 
         <div class="tab-content" id="nav-tabContent">
@@ -75,7 +75,7 @@
                 </div>
             </div>
             <div aria-labelledby="nav-notes-tab" class="tab-pane fade" id="nav-notes" role="tabpanel">
-                <button class="btn btn-info float-right" onclick="showNoteModal()" style="margin: 0.25em;"
+                <button id="btn-add-a-new-note" class="btn btn-info float-right" onclick="showNoteModal()" style="margin: 0.25em;"
                         type="button">
                     + Add a New Note
                 </button>
@@ -101,8 +101,8 @@
                                 <a class="btn btn-danger" th:href="@{/note/delete/{noteid}(noteid=*{note.noteid})}">Delete</a>
                             </td>
 
-                            <th scope="row"><p class="card-text" th:text="${note.notetitle}"/></th>
-                            <td><p class="card-text" th:text="${note.notedescription}"/></td>
+                            <th class="note-title" scope="row" th:text="*{note.notetitle}"></th>
+                            <td class="note-description" th:text="*{note.notedescription}"></td>
                         </tr>
                         </tbody>
                     </table>
@@ -144,7 +144,8 @@
                 </div>
             </div>
             <div aria-labelledby="nav-credentials-tab" class="tab-pane fade" id="nav-credentials" role="tabpanel">
-                <button class="btn btn-info float-right" onclick="showCredentialModal()" style="margin: 0.25em;"
+
+                <button id ="btn-add-new-cred" class="btn btn-info float-right" onclick="showCredentialModal()" style="margin: 0.25em;"
                         type="button">
                     + Add a New Credential
                 </button>
@@ -172,9 +173,9 @@
                                 <a th:href="@{/credential/delete/{credentialId}(credentialId=*{cred.credentialid})}" class="btn btn-danger">Delete</a>
                             </td>
 
-                            <th scope="row" th:text="*{cred.url}"></th>
-                            <td th:text="*{cred.username}"></td>
-                            <td>***********</td>
+                            <th class="cls-credential-url" scope="row" th:text="*{cred.url}"></th>
+                            <td class="cls-credential-username" th:text="*{cred.username}"></td>
+                            <td class="cls-credential-password">***********</td>
                         </tr>
                         </tbody>
                     </table>
@@ -216,7 +217,7 @@
                             </div>
                             <div class="modal-footer">
                                 <button class="btn btn-secondary" data-dismiss="modal" type="button">Close</button>
-                                <button class="btn btn-primary" onclick="$('#credentialSubmit').click();" type="button">
+                                <button id="btn-credentials-submit" class="btn btn-primary" onclick="$('#credentialSubmit').click();" type="button">
                                     Save changes
                                 </button>
                             </div>
