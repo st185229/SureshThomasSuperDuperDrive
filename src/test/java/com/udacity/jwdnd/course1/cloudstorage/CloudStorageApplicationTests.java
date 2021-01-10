@@ -10,6 +10,7 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 
+import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Random;
@@ -17,9 +18,6 @@ import java.util.Random;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class CloudStorageApplicationTests {
-
-    //@Autowired
-    // public static UserService userService;
 
     public static WebDriver driver;
     public static String baseURL;
@@ -30,7 +28,6 @@ class CloudStorageApplicationTests {
     public static void beforeAll() {
         WebDriverManager.chromedriver().setup();
         driver = new ChromeDriver();
-        // userService.deleteTestUsers();
 
     }
 
@@ -277,12 +274,12 @@ class CloudStorageApplicationTests {
 
         WebElement noteTitlesNew = null;
         try {
-             noteTitlesNew = driver.findElement(By.className("note-title"));
-        }catch (NoSuchElementException noSuchElementException){
+            noteTitlesNew = driver.findElement(By.className("note-title"));
+        } catch (NoSuchElementException noSuchElementException) {
             ;
         }
-        if(noteTitlesNew != null) {
-            Assertions.assertTrue((!noteTitlesOld.equals(noteTitlesNew)));
+        if (noteTitlesNew != null) {
+            Assertions.assertFalse((noteTitlesOld.equals(noteTitlesNew)));
         }
 
     }
@@ -296,9 +293,9 @@ class CloudStorageApplicationTests {
         driver.findElement(By.id("btn-add-new-cred")).click();
         Thread.sleep(2000);
 
-        String url = "udacity.com";
-        String userName = "alibaba";
-        String password = "abracadabra";
+        String url = randomStringGenerator(10)+".com";
+        String userName = randomStringGenerator(7);
+        String password = randomStringGenerator(7);
 
 
         driver.findElement(By.id("credential-url")).sendKeys(url);
@@ -345,13 +342,113 @@ class CloudStorageApplicationTests {
 
     }
 
-    /*
+    private String randomStringGenerator(Integer length){
 
-    Test 3:- Write tests for credential creation, viewing, editing, and deletion.
+        int leftLimit = 97; // letter 'a'
+        int rightLimit = 122; // letter 'z'
+        int targetStringLength = length;
+        Random random = new Random();
 
-        Write a test that views an existing set of credentials, verifies that the viewable password is unencrypted, edits the credentials, and verifies that the changes are displayed.
-        Write a test that deletes an existing set of credentials and verifies that the credentials are no longer displayed.
-     */
+        return random.ints(leftLimit, rightLimit + 1)
+                .limit(targetStringLength)
+                .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
+                .toString();
+
+    }
+
+    @Test
+    @Order(6)
+    void test_views_existing_credentials_verifies_that_viewable_password_is_unencrypted_edits_credentials_verifies_changes_displayed() throws InterruptedException {
+        registerAndLoginAndSelectCredentialTab();
+        Thread.sleep(2000);
+
+        driver.findElement(By.cssSelector("button[class='btn btn-success']")).click();
+        Thread.sleep(2000);
 
 
+
+        String url = randomStringGenerator(10)+".com";
+        String userName = randomStringGenerator(7);
+        String password = randomStringGenerator(7);
+
+        driver.findElement(By.id("credential-url")).clear();
+        driver.findElement(By.id("credential-url")).sendKeys(url);
+        driver.findElement(By.id("credential-username")).clear();
+        driver.findElement(By.id("credential-username")).sendKeys(userName);
+        driver.findElement(By.id("credential-password")).clear();
+        driver.findElement(By.id("credential-password")).sendKeys(password);
+        driver.findElement(By.id("btn-credentials-submit")).click();
+
+        Thread.sleep(2000);
+        String message = driver.findElement(By.id("alert-message")).getText();
+        Assertions.assertTrue(message.contains(url)
+                && message.contains(userName)
+                && message.contains("Updated Credentials")
+        );
+
+
+        driver.get("http://localhost:" + this.port + "/");
+        Thread.sleep(2000);
+        driver.findElement(By.id("nav-credentials-tab")).click();
+        Thread.sleep(2000);
+        var urls = driver.findElements(By.className("cls-credential-url"));
+        var usernames = driver.findElements(By.className("cls-credential-username"));
+        var passwords = driver.findElements(By.className("cls-credential-password"));
+
+        var createdURL = urls.stream()
+                .filter(urlElement -> url.equals(urlElement.getText()))
+                .findAny()
+                .orElse(null);
+        Assertions.assertEquals(createdURL.getText(), url);
+
+        var createdUsername = usernames.stream()
+                .filter(userNameElement -> userName.equals(userNameElement.getText()))
+                .findAny()
+                .orElse(null);
+        Assertions.assertEquals(createdUsername.getText(), userName);
+
+        var createdPasswords = passwords.stream()
+                .filter(passwordElement -> password.equals(passwordElement.getText()))
+                .findAny()
+                .orElse(null);
+        // Password should not match with what's provided - so should return null
+        Assertions.assertNull(createdPasswords);
+    }
+
+    @Test
+    @Order(7)
+    void test_deletes_existing_credentials_verifies_that_credentials_not_displayed() throws InterruptedException {
+
+        registerAndLoginAndSelectCredentialTab();
+        Thread.sleep(2000);
+
+        //Read the top row
+        var urlOnTopRowOld = driver.findElement(By.className("cls-credential-url"));
+
+        driver.findElement(By.cssSelector("a[class='btn btn-danger']")).click();
+        Thread.sleep(2000);
+
+        String message = driver.findElement(By.id("alert-message")).getText();
+        Assertions.assertTrue(message.contains("Deleted Credential"));
+
+        driver.get("http://localhost:" + this.port + "/");
+        Thread.sleep(2000);
+        driver.findElement(By.id("nav-credentials-tab")).click();
+        Thread.sleep(2000);
+
+        WebElement urlOnTopRowNew = null;
+
+        try {
+            urlOnTopRowNew = driver.findElement(By.className("cls-credential-url"));
+        } catch (NoSuchElementException noSuchElementException) {
+            ;
+        }
+        if (urlOnTopRowNew != null) {
+            Assertions.assertFalse((urlOnTopRowOld.equals(urlOnTopRowNew)));
+        }
+
+    }
 }
+
+
+
